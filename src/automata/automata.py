@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import math
 
 #name to save the automata
@@ -48,7 +48,7 @@ def BuildMainCircle():
 
         #add new point
         nodes_temp = nodes[c - 1]
-        nodes[c - 1] = [nodes_temp,x,y,angle] #convert ['1','2',...] to [['1',x,y],['2',x,y],...]
+        nodes[c - 1] = [nodes_temp,x,y,angle] #convert ['1','2',...] to [['1',x,y,angle],['2',x,y,angle],...]
 
         c = c + 1
     return
@@ -65,6 +65,8 @@ def DrawNodes():
         #draw a circle in the box
         box = (x - node_radius, y - node_radius, x + node_radius, y + node_radius)
         draw.ellipse(box, fill='black', outline ='blue')
+        #draw state
+        draw.text((x - 2,y - 5), node[0], fill='white')
         image.save(name_automata + extension)
     return
 
@@ -87,7 +89,7 @@ def DrawArrows():
             if destiny in node:
                 destiny_center = [node[1],node[2]]
 
-        #if the orgin is different to destiny
+        #if the origin is different to destiny
         if origin != destiny:
             #draw line
             box = (origin_center[0], origin_center[1], destiny_center[0], destiny_center[1])
@@ -95,7 +97,7 @@ def DrawArrows():
             image.save(name_automata + extension)
         elif origin == destiny:
             #draw circle
-            
+
             pass
 
     return
@@ -107,7 +109,7 @@ def DrawAutomata():
     BuildMainCircle()
     #Draw nodes
     DrawNodes()
-
+    #Draw arrows
     DrawArrows()
     return
 
