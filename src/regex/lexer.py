@@ -1,13 +1,8 @@
 import re
 
-# read example file
-f = open("examples.txt", "r")
-examples = f.read();
-f.close()
-
-# regular expressions to match
+""" regular expressions to match """
 regexs = {
-    "literal": "\"((\\\.)|[^\"])*\"",
+    "literal": '"((\\\.)|[^"])*"',
     "open_parenthesis": "\(",
     "close_porenthesis": "\)",
     "open_bracket": "\[",
@@ -18,11 +13,12 @@ regexs = {
     "star": "\*",
     "optional": "\?",
     "comma": ",",
-    "to": "-"
+    "to": "-",
 }
 
-# gets the closest and largest token
+
 def next_token(blob):
+    """ gets the closest largest token """
     key = None
     match = None
     for new_key, value in regexs.items():
@@ -34,8 +30,7 @@ def next_token(blob):
             if new_match.start() < match.start():
                 key = new_key
                 match = new_match
-            elif (new_match.start() == match.start() and
-                  new_match.end() >= match.end()):
+            elif new_match.start() == match.start() and new_match.end() >= match.end():
                 key = new_key
                 match = new_match
     if key is None or match is None:
@@ -43,16 +38,12 @@ def next_token(blob):
     else:
         return (key, match)
 
-blob = examples
-tokens = []
-token = next_token(blob)
 
-# matches tokens in blob
-while token is not None:
-    tokens.append(token)
-    blob = blob[token[1].end(0):]
+def tokens(blob):
+    """ matches tokens in blob """
     token = next_token(blob)
-
-# prints tokens
-for token in tokens:
-    print("{0}: {1}".format(token[0], token[1].group(0)))
+    while token is not None:
+        (key, match) = token
+        blob = blob[match.end(0) :]
+        token = next_token(blob)
+        yield (key, match.group(0))
