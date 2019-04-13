@@ -6,8 +6,8 @@ name_automata = 'test'
 extension = '.png'
 
 #automata's nodes and edges
-nodes = list(['1','2','3']) #states
-edges = list([['1','2','a'],['1','3','b'],['2','2','b']]) #[origin, destiny, symbol]
+nodes = list(['0','1','2']) #states
+edges = list([['0','1','a'],['0','2','b'],['1','1','b']]) #[origin, destiny, symbol]
 
 #image size
 width = 400
@@ -26,7 +26,7 @@ def BuildMainCircle():
     print("\tBuilding main circle...")
     
     global width, heigth, main_circle_radius
-    global nodes, nodes_center
+    global nodes
 
     h = int(width / 2)
     k = int(heigth / 2)
@@ -55,8 +55,9 @@ def BuildMainCircle():
 
 def DrawNodes():
     print("\tDrawing nodes...")
-    global name_automata
+    global name_automata, extension
     global image, draw, node_radius
+    global nodes
 
     #for each node in nodes
     for node in nodes:
@@ -64,16 +65,16 @@ def DrawNodes():
         y = node[2]
         #draw a circle in the box
         box = (x - node_radius, y - node_radius, x + node_radius, y + node_radius)
-        draw.ellipse(box, fill='black', outline ='blue')
+        draw.ellipse(box, fill='white', outline ='black',width=2)
         #draw state
-        draw.text((x - 2,y - 5), node[0], fill='white')
+        draw.text((x - 2,y - 5), node[0], fill='black')
         image.save(name_automata + extension)
     return
 
 def DrawArrows():
     print("\tDrawing arrows...")
-    global nodes, edges, name_automata
-    global image, draw
+    global nodes, edges, name_automata, extension
+    global image, draw, node_radius
 
     #draw line origin to destiny
     for edge in edges:
@@ -81,13 +82,16 @@ def DrawArrows():
         destiny = edge[1]
         origin_center = [0,0] #x,y
         destiny_center = [0,0] #x,y
+        angle = 0
 
         #find origin and destiny centers
         for node in nodes:
             if origin in node:
                 origin_center = [node[1],node[2]]
+                angle = node[3]
             if destiny in node:
                 destiny_center = [node[1],node[2]]
+                angle = node[3]
 
         #if the origin is different to destiny
         if origin != destiny:
@@ -97,8 +101,16 @@ def DrawArrows():
             image.save(name_automata + extension)
         elif origin == destiny:
             #draw circle
+            h_node = origin_center[0]
+            k_node = origin_center[1]
+            arrow_radius = 10
+            x = int(math.cos(math.radians(angle)) * node_radius + h_node)
+            y = int(math.sin(math.radians(angle)) * node_radius + k_node)
 
-            pass
+            #draw a circle in the box
+            box = (x - arrow_radius, y - arrow_radius, x + arrow_radius, y + arrow_radius)
+            draw.ellipse(box, outline = 'black', width=2)
+            image.save(name_automata + extension)
 
     return
     
@@ -107,10 +119,10 @@ def DrawAutomata():
     print("Building automata ... {0}".format(name_automata))
     #Build main circle
     BuildMainCircle()
-    #Draw nodes
-    DrawNodes()
     #Draw arrows
     DrawArrows()
+    #Draw nodes
+    DrawNodes()
     return
 
 #Draw Automata
