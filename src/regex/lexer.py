@@ -4,7 +4,7 @@ import re
 regexs = {
     "literal": '"((\\\.)|[^"])*"',
     "open_parenthesis": "\(",
-    "close_porenthesis": "\)",
+    "close_parenthesis": "\)",
     "open_bracket": "\[",
     "close_bracket": "\]",
     "or": "\|",
