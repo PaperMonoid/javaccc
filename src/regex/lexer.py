@@ -1,27 +1,28 @@
 import re
 
 """ regular expressions to match """
-regexs = {
-    "literal": '"((\\\.)|[^"])*"',
-    "open_parenthesis": "\(",
-    "close_parenthesis": "\)",
-    "open_bracket": "\[",
-    "close_bracket": "\]",
-    "or": "\|",
-    "not": "~",
-    "plus": "\+",
-    "star": "\*",
-    "optional": "\?",
-    "comma": ",",
-    "to": "-",
-}
+regexs = [
+    ("LITERAL", '"((\\\.)|[^"])*"'),
+    ("CHARACTER", '"((\\\.)|[^"])?"'),
+    ("OPEN_PARENTHESIS", "\("),
+    ("CLOSE_PARENTHESIS", "\)"),
+    ("OPEN_BRACKET", "\["),
+    ("CLOSE_BRACKET", "\]"),
+    ("OR", "\|"),
+    ("NOT", "~"),
+    ("PLUS", "\+"),
+    ("STAR", "\*"),
+    ("OPTIONAL", "\?"),
+    ("COMMA", ","),
+    ("TO", "-"),
+]
 
 
 def next_token(blob):
     """ gets the closest largest token """
     key = None
     match = None
-    for new_key, value in regexs.items():
+    for (new_key, value) in regexs:
         new_match = re.search(value, blob)
         if match is None:
             key = new_key
