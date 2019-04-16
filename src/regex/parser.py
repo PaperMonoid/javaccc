@@ -46,6 +46,18 @@ class Parser:
     def is_close_parenthesis(self):
         return self.token[0] == "CLOSE_PARENTHESIS"
 
+    def is_not(self):
+        return self.token[0] == "NOT"
+
+    def is_plus(self):
+        return self.token[0] == "PLUS"
+
+    def is_star(self):
+        return self.token[0] == "STAR"
+
+    def is_optional(self):
+        return self.token[0] == "OPTIONAL"
+
     def parse_alphabet_member(self):
         character = self.token
         self.next()
@@ -72,17 +84,39 @@ class Parser:
             return member + self.parse_alphabet()
         raise ParseError("CLOSE_BRACKET or CHARACTER", self.token)
 
+    def parse_modifier(self):
+        if self.is_plus():
+            pass
+
     def parse_expression(self):
         if self.is_string():
             string = self.token
             self.next()
             return [string]
+        elif self.is_not():
+            self.next()
+            if self.is_open_bracket():
+                self.next()
+                return [("NOT", ("ALPHABET", self.parse_alphabet()))]
+            else:
+                raise ParseError("OPEN_BRACE", self.token)
         elif self.is_open_bracket():
             self.next()
             return [("ALPHABET", self.parse_alphabet())]
         elif self.is_open_parenthesis():
             self.next()
-            return [("GROUP", self.parse_group())]
+            group = self.parse_group()
+            if self.is_plus():
+                self.next()
+                return [("PLUS", ("GROUP", group))]
+            elif self.is_star():
+                self.next()
+                return [("STAR", ("GROUP", group))]
+            elif self.is_optional():
+                self.next()
+                return [("OPTIONAL", ("GROUP", group))]
+            else:
+                return [("GROUP", group)]
         raise ParseError("STRING or OPEN_BRACKET or OPEN_PARENTHESIS", self.token)
 
     def parse_group(self):
@@ -117,7 +151,9 @@ ast = parse(
             ("LITERAL", "TWO"),
             ("LITERAL", "THREE"),
             ("CLOSE_PARENTHESIS", ")"),
+            ("OPTIONAL", "?"),
             ("CLOSE_PARENTHESIS", ")"),
+            ("NOT", "~"),
             ("OPEN_BRACKET", "["),
             ("CHARACTER", "a"),
             ("COMMA", ","),
