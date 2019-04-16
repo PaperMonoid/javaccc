@@ -33,13 +33,13 @@ def is_close_bracket(token):
     return token[0] == "CLOSE_BRACKET"
 
 
-def parse(tokens, ast):
+def parse(tokens, ast=[]):
     try:
         token = next(tokens)
         if is_string(token):
-            return token
+            return parse(tokens, ast + [token])
         elif is_open_bracket(token):
-            return ["ALPHABET", parse_alphabet(tokens, [])]
+            return parse(tokens, ast + [("ALPHABET", parse_alphabet(tokens))])
     except ParseError as error:
         print(error)
         return ast
@@ -47,7 +47,7 @@ def parse(tokens, ast):
         return ast
 
 
-def parse_alphabet(tokens, ast):
+def parse_alphabet(tokens, ast=[]):
     token = next(tokens)
     if is_close_bracket(token):
         return ast
@@ -77,6 +77,7 @@ def parse_alphabet(tokens, ast):
 ast = parse(
     iter(
         [
+            ("LITERAL", "hello"),
             ("OPEN_BRACKET", "["),
             ("CHARACTER", "a"),
             ("COMMA", ","),
