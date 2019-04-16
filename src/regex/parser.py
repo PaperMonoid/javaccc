@@ -46,6 +46,9 @@ class Parser:
     def is_close_parenthesis(self):
         return self.token[0] == "CLOSE_PARENTHESIS"
 
+    def is_or(self):
+        return self.token[0] == "OR"
+
     def is_not(self):
         return self.token[0] == "NOT"
 
@@ -88,7 +91,7 @@ class Parser:
         if self.is_plus():
             pass
 
-    def parse_expression(self):
+    def parse_atom(self):
         if self.is_string():
             string = self.token
             self.next()
@@ -119,6 +122,22 @@ class Parser:
                 return [("GROUP", group)]
         raise ParseError("STRING or OPEN_BRACKET or OPEN_PARENTHESIS", self.token)
 
+    def parse_or(self):
+        atom = self.parse_atom()
+        if self.is_or():
+            self.next()
+            return atom + self.parse_or()
+        else:
+            return atom
+
+    def parse_expression(self):
+        atom = self.parse_atom()
+        if self.is_or():
+            self.next()
+            return [("OR", atom + self.parse_or())]
+        else:
+            return atom
+
     def parse_group(self):
         if self.is_close_parenthesis():
             self.next()
@@ -144,7 +163,9 @@ ast = parse(
             ("LITERAL", "hello"),
             ("OPEN_PARENTHESIS", "("),
             ("LITERAL", "ONE"),
+            ("OR", "|"),
             ("LITERAL", "TWO"),
+            ("OR", "|"),
             ("LITERAL", "THREE"),
             ("OPEN_PARENTHESIS", "("),
             ("LITERAL", "ONE"),
