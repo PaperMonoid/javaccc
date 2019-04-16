@@ -5,73 +5,83 @@ class ParseError(Exception):
         self.args = [self.strerror]
 
 
-def is_character(token):
-    return token[0] == "CHARACTER"
+class Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.next()
 
+    def next(self):
+        try:
+            self.token = next(self.tokens)
+        except StopIteration:
+            self.token = ("EOF", "")
 
-def is_literal(token):
-    return token[0] == "LITERAL"
+    def is_eof(self):
+        return self.token[0] == "EOF"
 
+    def is_character(self):
+        return self.token[0] == "CHARACTER"
 
-def is_string(token):
-    return is_character(token) or is_literal(token)
+    def is_literal(self):
+        return self.token[0] == "LITERAL"
 
+    def is_string(self):
+        return self.is_character() or self.is_literal()
 
-def is_comma(token):
-    return token[0] == "COMMA"
+    def is_comma(self):
+        return self.token[0] == "COMMA"
 
+    def is_to(self):
+        return self.token[0] == "TO"
 
-def is_to(token):
-    return token[0] == "TO"
+    def is_open_bracket(self):
+        return self.token[0] == "OPEN_BRACKET"
 
+    def is_close_bracket(self):
+        return self.token[0] == "CLOSE_BRACKET"
 
-def is_open_bracket(token):
-    return token[0] == "OPEN_BRACKET"
-
-
-def is_close_bracket(token):
-    return token[0] == "CLOSE_BRACKET"
-
-
-def parse(tokens, ast=[]):
-    try:
-        token = next(tokens)
-        if is_string(token):
-            return parse(tokens, ast + [token])
-        elif is_open_bracket(token):
-            return parse(tokens, ast + [("ALPHABET", parse_alphabet(tokens))])
-    except ParseError as error:
-        print(error)
-        return ast
-    except:
-        return ast
-
-
-def parse_alphabet(tokens, ast=[]):
-    token = next(tokens)
-    if is_close_bracket(token):
-        return ast
-    elif is_character(token):
-        first = token
-        token = next(tokens)
-        if is_close_bracket(token):
-            return ast + [first]
-        elif is_comma(token):
-            return parse_alphabet(tokens, ast + [first])
-        elif is_to(token):
-            token = next(tokens)
-            if is_character(token):
-                second = token
-                token = next(tokens)
-                if is_close_bracket(token):
-                    return ast + [[first, second]]
-                elif is_comma(token):
-                    return parse_alphabet(tokens, ast + [("RANGE", [first, second])])
+    def parse_alphabet_member(self):
+        character = self.token
+        self.next()
+        if self.is_to():
+            self.next()
+            if self.is_character():
+                lower = character
+                upper = self.token
+                self.next()
+                return [("RANGE", [lower, upper])]
             else:
-                raise ParseError("CHARACTER", token)
+                raise ParseError("CHARACTER", self.token)
         else:
-            raise ParseError("CLOSE_BRACKET or COMMA or TO", token)
-    raise ParseError("CLOSE_BRACKET or CHARACTER", token)
+            return [character]
+
+    def parse_alphabet(self):
+        if self.is_close_bracket():
+            self.next()
+            return []
+        elif self.is_character():
+            member = self.parse_alphabet_member()
+            if self.is_comma():
+                self.next()
+            return member + self.parse_alphabet()
+        raise ParseError("CLOSE_BRACKET or CHARACTER", self.token)
+
+    def parse(self):
+        if self.is_eof():
+            return []
+        elif self.is_string():
+            string = self.token
+            self.next()
+            return [string] + self.parse()
+        elif self.is_open_bracket():
+            self.next()
+            return [("ALPHABET", self.parse_alphabet())] + self.parse()
+        raise ParseError("EOF or STRING or OPEN_BRACKET", self.token)
+
+
+def parse(tokens):
+    parser = Parser(tokens)
+    return parser.parse()
 
 
 ast = parse(
@@ -94,8 +104,7 @@ ast = parse(
             ("CHARACTER", "a"),
             ("CLOSE_BRACKET", "]"),
         ]
-    ),
-    [],
+    )
 )
 
 print(ast)
