@@ -40,6 +40,12 @@ class Parser:
     def is_close_bracket(self):
         return self.token[0] == "CLOSE_BRACKET"
 
+    def is_open_parenthesis(self):
+        return self.token[0] == "OPEN_PARENTHESIS"
+
+    def is_close_parenthesis(self):
+        return self.token[0] == "CLOSE_PARENTHESIS"
+
     def parse_alphabet_member(self):
         character = self.token
         self.next()
@@ -66,17 +72,31 @@ class Parser:
             return member + self.parse_alphabet()
         raise ParseError("CLOSE_BRACKET or CHARACTER", self.token)
 
+    def parse_expression(self):
+        if self.is_string():
+            string = self.token
+            self.next()
+            return [string]
+        elif self.is_open_bracket():
+            self.next()
+            return [("ALPHABET", self.parse_alphabet())]
+        elif self.is_open_parenthesis():
+            self.next()
+            return [("GROUP", self.parse_group())]
+        raise ParseError("STRING or OPEN_BRACKET or OPEN_PARENTHESIS", self.token)
+
+    def parse_group(self):
+        if self.is_close_parenthesis():
+            self.next()
+            return []
+        else:
+            return self.parse_expression() + self.parse_group()
+
     def parse(self):
         if self.is_eof():
             return []
-        elif self.is_string():
-            string = self.token
-            self.next()
-            return [string] + self.parse()
-        elif self.is_open_bracket():
-            self.next()
-            return [("ALPHABET", self.parse_alphabet())] + self.parse()
-        raise ParseError("EOF or STRING or OPEN_BRACKET", self.token)
+        else:
+            return self.parse_expression() + self.parse()
 
 
 def parse(tokens):
@@ -88,6 +108,16 @@ ast = parse(
     iter(
         [
             ("LITERAL", "hello"),
+            ("OPEN_PARENTHESIS", "("),
+            ("LITERAL", "ONE"),
+            ("LITERAL", "TWO"),
+            ("LITERAL", "THREE"),
+            ("OPEN_PARENTHESIS", "("),
+            ("LITERAL", "ONE"),
+            ("LITERAL", "TWO"),
+            ("LITERAL", "THREE"),
+            ("CLOSE_PARENTHESIS", ")"),
+            ("CLOSE_PARENTHESIS", ")"),
             ("OPEN_BRACKET", "["),
             ("CHARACTER", "a"),
             ("COMMA", ","),
