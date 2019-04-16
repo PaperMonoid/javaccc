@@ -39,7 +39,7 @@ def parse(tokens, ast):
         if is_string(token):
             return token
         elif is_open_bracket(token):
-            return parse_alphabet(tokens, [])
+            return ["ALPHABET", parse_alphabet(tokens, [])]
     except ParseError as error:
         print(error)
         return ast
@@ -66,7 +66,7 @@ def parse_alphabet(tokens, ast):
                 if is_close_bracket(token):
                     return ast + [[first, second]]
                 elif is_comma(token):
-                    return parse_alphabet(tokens, ast + [[first, second]])
+                    return parse_alphabet(tokens, ast + [("RANGE", [first, second])])
             else:
                 raise ParseError("CHARACTER", token)
         else:
@@ -78,7 +78,7 @@ ast = parse(
     iter(
         [
             ("OPEN_BRACKET", "["),
-            ("STRING", "a"),
+            ("CHARACTER", "a"),
             ("COMMA", ","),
             ("CHARACTER", "e"),
             ("COMMA", ","),
