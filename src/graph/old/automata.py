@@ -108,10 +108,10 @@ def DrawArrows():
             x_node = origin_center[0]
             y_node = origin_center[1]
 
-            #find the angle on the node circumference in the direction of the angle where the origin node was drawing
+            #find the angle on the node circumference in the direction of the angle where the origin node was drawn
             angle = int(math.degrees(math.atan2(y_node - k_node,x_node - h_node)) % 360)
 
-            #find a point on the node circumference in the direcction of the angle where the origin node was drawing
+            #find a point on the node circumference in the direcction of the angle where the origin node was drawn
             x = int(math.cos(math.radians(angle)) * node_radius + h_node)
             y = int(math.sin(math.radians(angle)) * node_radius + k_node)
 
@@ -134,8 +134,19 @@ def DrawArrows():
             draw.line(box, fill='black', width=2)
             image.save(name_automata + extension)
 
+            # #point for the text
+            # #find the angle on the node circumference in the direction of the angle where the destiny node was drawn
+            # angle = int(math.degrees(math.atan2(k_node - y_node,h_node - x_node)) % 360)
+            # x = int(math.cos(math.radians(angle + 45)) * (node_radius) + x_node)
+            # y = int(math.sin(math.radians(angle + 45)) * (node_radius) + h_node)
+            
+            # #draw symbol
+            # draw.text((x,y), edge[2], fill='black')
+            # image.save(name_automata + extension)
+            # image.save(name_automata + extension)
+
         elif origin == destiny:
-            #draw circle
+            #draw circle on direction where node was drawn
             h_node = destiny_center[0]
             k_node = destiny_center[1]
             arrow_radius = 10
@@ -147,52 +158,36 @@ def DrawArrows():
             draw.ellipse(box, outline = 'black', width=2)
             image.save(name_automata + extension)
 
-            #draw arrow
-            #draw >
-            arrow_radius = 8
-            arrow_angle = 45
-            arrow_x = 0
-            arrow_y = 0
-            ##draw line 45 degrees minus to main line
-            x = int(math.cos(math.radians(destiny_angle - arrow_angle)) * node_radius + h_node)
-            y = int(math.sin(math.radians(destiny_angle - arrow_angle)) * node_radius + k_node)
-
-            draw.point((x,y), fill='red')
+            #point for the text
+            x = int(math.cos(math.radians(destiny_angle)) * (arrow_radius + 10) + x)
+            y = int(math.sin(math.radians(destiny_angle)) * (arrow_radius + 10) + y)
+            
+            #draw symbol
+            draw.text((x,y), edge[2], fill='black')
+            image.save(name_automata + extension)
             image.save(name_automata + extension)
 
-            
+            # #draw >
+            # arrow_radius = 8
+            # arrow_angle = 45
+            # arrow_x = 0
+            # arrow_y = 0
+
+            # ##draw line 45 degrees minus to main line
+            # arrow_x = int(math.cos(math.radians(destiny_angle - arrow_angle)) * arrow_radius + x)
+            # arrow_y = int(math.sin(math.radians(destiny_angle - arrow_angle)) * arrow_radius + y)
             # box = (arrow_x, arrow_y, x, y)
             # draw.line(box, fill='black', width=2)
             # image.save(name_automata + extension)
 
             # #draw line 45 degrees plus to main line
-            # arrow_x = int(math.cos(math.radians(angle + arrow_angle)) * arrow_radius + x)
-            # arrow_y = int(math.sin(math.radians(angle + arrow_angle)) * arrow_radius + y)
+            # arrow_x = int(math.cos(math.radians(destiny_angle + arrow_angle)) * arrow_radius + x)
+            # arrow_y = int(math.sin(math.radians(destiny_angle + arrow_angle)) * arrow_radius + y)
             # box = (arrow_x, arrow_y, x, y)
             # draw.line(box, fill='black', width=2)
             # image.save(name_automata + extension)
 
     return
-
-def ConvertXScreenToCartesian(_x_screen):
-    global width
-    _x_cartesian = _x_screen - width  / 2
-    return _x_cartesian
-
-def ConvertYScreenToCartesian(_y_screen):
-    global heigth
-    _y_cartesian = -_y_screen + heigth / 2
-    return _y_cartesian
-
-def ConvertXCartesianToScreen(_x_cartesian):
-    global width
-    _x_screen = _x_cartesian - width  / 2
-    return _x_screen
-
-def ConvertYCartesianToScreen(_y_cartesian):
-    global heigth
-    _y_screen = -_y_cartesian + heigth / 2
-    return _y_screen
     
 def DrawAutomata():
     global name_automata
@@ -202,7 +197,7 @@ def DrawAutomata():
     #Draw arrows
     DrawArrows()
     #Draw nodes
-    #DrawNodes()
+    DrawNodes()
     return
 
 #Draw Automata
