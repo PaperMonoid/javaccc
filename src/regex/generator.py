@@ -55,11 +55,25 @@ class Automata:
             return Automata(nodes, edges)
 
     @staticmethod
+    def parse(ast):
+        automatas = []
+        for child in ast:
+            if child[0] == "CHARACTER":
+                automatas.append(CharacterAutomata(child))
+            elif child[0] == "LITERAL":
+                automatas.append(LiteralAutomata(child))
+            elif child[0] == "ALPHABET" or child[0] == "NOT":
+                automatas.append(CharacterClassAutomata(child))
+        return Automata.union(automatas)
+
+    @staticmethod
     def union(others):
         nodes = ["0"]
         edges = []
         if len(others) == 0:
             return Automata()
+        if len(others) == 1:
+            return others[0]
         last = 1
         for other in others:
             last = last + len(other.nodes)
@@ -70,8 +84,8 @@ class Automata:
             edges.append(["0", str(i), ""])
             for (origin, destiny, state) in other.edges:
                 edges.append([str(i + int(origin)), str(i + int(destiny)), state])
-            edges.append([str(i + 1), str(last), ""])
             i = i + len(other.nodes)
+            edges.append([str(i - 1), str(last), ""])
         nodes.append(str(last))
         return Automata(nodes, edges)
 
