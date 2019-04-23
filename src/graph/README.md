@@ -26,8 +26,33 @@ If a path is not provided, it is saved in the current path.
 
 ## Output
 
-test.gv file:
+automata.gv file:
 
+```
+digraph finite_state_machine {
+	rankdir=LR;
+	size="8,5"
 
-test.png file:
+	node [ shape = doublecircle, label = "0", fontsize  = 14] n0;
+
+	node [ shape = circle, label = "1", fontsize  = 12] n1;
+	node [ shape = circle, label = "2", fontsize  = 12] n2;
+
+	node [ shape = doublecircle, label = "3", fontsize  = 14] n3;
+
+	node [shape = point ]; qi
+	qi -> n0;
+
+	n0 -> n1 [ label = "a" ];
+	n0 -> n2 [ label = "b" ];
+	n1 -> n1 [ label = "b" ];
+	n1 -> n2 [ label = "c" ];
+	n2 -> n2 [ label = "b" ];
+	n2 -> n3 [ label = "b" ];
+	n2 -> n1 [ label = "g" ];
+}
+```
+
+automata.png file:
+
 ![test.png](https://github.com/PaperMonoid/javaccc/blob/master/src/graph/test.png "test.png")
