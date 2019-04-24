@@ -55,49 +55,6 @@ class Automata:
             return Automata(nodes, edges)
 
     @staticmethod
-    def parse(ast):
-        automata = Automata()
-        for child in ast:
-            if child[0] == "CHARACTER":
-                automata = automata.concatenate(CharacterAutomata(child[1]))
-            elif child[0] == "LITERAL":
-                automata = automata.concatenate(LiteralAutomata(child[1]))
-            elif child[0] == "NOT":
-                child = child[1]
-                if child[0] == "ALPHABET":
-                    automata = automata.concatenate(
-                        CharacterClassAutomata(child[1], True)
-                    )
-            elif child[0] == "ALPHABET":
-                automata = automata.concatenate(CharacterClassAutomata(child[1]))
-            elif child[0] == "GROUP":
-                automata = automata.concatenate(GroupAutomata(child[1]))
-            elif child[0] == "OR":
-                subautomatas = []
-                for grandchild in child[1]:
-                    subautomatas.append(Automata.parse([grandchild]))
-                automata = automata.concatenate(Automata.union(subautomatas))
-            elif child[0] == "OPTIONAL":
-                child = child[1]
-                if child[0] == "GROUP":
-                    automata = automata.concatenate(
-                        OptionalAutomata(GroupAutomata(child[1]))
-                    )
-            elif child[0] == "PLUS":
-                child = child[1]
-                if child[0] == "GROUP":
-                    automata = automata.concatenate(
-                        PlusAutomata(GroupAutomata(child[1]))
-                    )
-            elif child[0] == "STAR":
-                child = child[1]
-                if child[0] == "GROUP":
-                    automata = automata.concatenate(
-                        StarAutomata(GroupAutomata(child[1]))
-                    )
-        return automata
-
-    @staticmethod
     def union(others):
         nodes = ["0"]
         edges = []
@@ -166,7 +123,7 @@ class CharacterClassAutomata(Automata):
 
 class GroupAutomata(Automata):
     def __init__(self, ast):
-        automata = Automata.parse(ast)
+        automata = generate(ast)
         self.nodes = automata.nodes
         self.edges = automata.edges
 
@@ -227,3 +184,40 @@ class StarAutomata(Automata):
         self.edges.append([str(first), str(last), ""])
         self.edges.append([str(last - 1), str(first + 1), ""])
         self.nodes.append(str(last))
+
+
+def generate(ast):
+    automata = Automata()
+    for child in ast:
+        if child[0] == "CHARACTER":
+            automata = automata.concatenate(CharacterAutomata(child[1]))
+        elif child[0] == "LITERAL":
+            automata = automata.concatenate(LiteralAutomata(child[1]))
+        elif child[0] == "NOT":
+            child = child[1]
+            if child[0] == "ALPHABET":
+                automata = automata.concatenate(CharacterClassAutomata(child[1], True))
+        elif child[0] == "ALPHABET":
+            automata = automata.concatenate(CharacterClassAutomata(child[1]))
+        elif child[0] == "GROUP":
+            automata = automata.concatenate(GroupAutomata(child[1]))
+        elif child[0] == "OR":
+            subautomatas = []
+            for grandchild in child[1]:
+                subautomatas.append(generate([grandchild]))
+            automata = automata.concatenate(Automata.union(subautomatas))
+        elif child[0] == "OPTIONAL":
+            child = child[1]
+            if child[0] == "GROUP":
+                automata = automata.concatenate(
+                    OptionalAutomata(GroupAutomata(child[1]))
+                )
+        elif child[0] == "PLUS":
+            child = child[1]
+            if child[0] == "GROUP":
+                automata = automata.concatenate(PlusAutomata(GroupAutomata(child[1])))
+        elif child[0] == "STAR":
+            child = child[1]
+            if child[0] == "GROUP":
+                automata = automata.concatenate(StarAutomata(GroupAutomata(child[1])))
+    return automata
