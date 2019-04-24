@@ -6,7 +6,7 @@ The token generator for JavaCC is an algorithm written in Python to give the inf
 
 This project requires a CSV file with the name of the token as the first field and lexeme or regex as the second field. This CSV file can easily be generated in excel or google sheets, just like this:
 
-![sample-file](imgs/sample-file.jpg)
+![sample-file](imgs/sample-file.JPG)
 ![sample-file](imgs/sample-save.jpg)
 
 After this you can run the script `python tokens-javacc-generator.py`:
