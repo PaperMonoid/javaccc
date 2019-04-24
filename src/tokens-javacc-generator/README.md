@@ -62,4 +62,32 @@ TOKEN:
 }
 ```
 
-**For the moment, you should remove the double quotes for the outputs of regular expressions you provide in the .csv file. We will fix it in later versions.**
+**For the moment, you should remove the double quotes for the outputs of regular expressions you provide in the .csv file. We will fix it in later versions. For example:**
+
+```
+TOKEN:
+{
+        //TOKEN's name: t_var_name
+        <t_var_name: "(["a"-"z","A"-"Z"]|"_")(["a"-"z","A"-"Z"]|"_"|["0"-"9"])*">{  } : DEFAULT
+}
+TOKEN:
+{
+        //TOKEN's name: t_char_value
+        <t_char_value: "("\""(~["\n"])"\"")|("'"(~["\n"])"'")">{  } : DEFAULT
+}
+TOKEN:
+{
+        //TOKEN's name: t_string_value
+        <t_string_value: "("\""(~["\n"])*"\"")|("'"(~["\n"])*"'")">{  } : DEFAULT
+}
+TOKEN:
+{
+        //TOKEN's name: t_int_value
+        <t_int_value: "("-"|"+")?(["0"-"9"])+">{  } : DEFAULT
+}
+TOKEN:
+{
+        //TOKEN's name: t_float_value
+        <t_float_value: "<t_int_value>"."(["0"-"9"])+">{  } : DEFAULT
+}
+```

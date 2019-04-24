@@ -55,4 +55,4 @@ digraph finite_state_machine {
 
 automata.png file:
 
-![automata.png](https://github.com/PaperMonoid/javaccc/blob/master/src/graph/automata.png "automata.png")
+![automata.png](imgs/automata.png "automata.png")
