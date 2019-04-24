@@ -1,6 +1,6 @@
 def charset_create(lower=32, upper=126):
     charset = []
-    for char in range(lower, upper):
+    for char in range(lower, upper + 1):
         charset.append(chr(char))
     return charset
 
@@ -56,15 +56,41 @@ class Automata:
 
     @staticmethod
     def parse(ast):
-        automatas = []
+        automata = Automata()
         for child in ast:
             if child[0] == "CHARACTER":
-                automatas.append(CharacterAutomata(child))
+                automata = automata.concatenate(CharacterAutomata(child[1]))
             elif child[0] == "LITERAL":
-                automatas.append(LiteralAutomata(child))
-            elif child[0] == "ALPHABET" or child[0] == "NOT":
-                automatas.append(CharacterClassAutomata(child))
-        return Automata.union(automatas)
+                automata = automata.concatenate(LiteralAutomata(child[1]))
+            elif child[0] == "NOT":
+                child = child[1]
+                if child[0] == "ALPHABET":
+                    automata = automata.concatenate(
+                        CharacterClassAutomata(child[1], True)
+                    )
+            elif child[0] == "ALPHABET":
+                automata = automata.concatenate(CharacterClassAutomata(child[1]))
+            elif child[0] == "GROUP":
+                automata = automata.concatenate(GroupAutomata(child[1]))
+            elif child[0] == "OPTIONAL":
+                child = child[1]
+                if child[0] == "GROUP":
+                    automata = automata.concatenate(
+                        OptionalAutomata(GroupAutomata(child[1]))
+                    )
+            elif child[0] == "PLUS":
+                child = child[1]
+                if child[0] == "GROUP":
+                    automata = automata.concatenate(
+                        PlusAutomata(GroupAutomata(child[1]))
+                    )
+            elif child[0] == "STAR":
+                child = child[1]
+                if child[0] == "GROUP":
+                    automata = automata.concatenate(
+                        StarAutomata(GroupAutomata(child[1]))
+                    )
+        return automata
 
     @staticmethod
     def union(others):
@@ -94,15 +120,15 @@ class Automata:
 
 
 class CharacterAutomata(Automata):
-    def __init__(self, token):
-        attribute = token[1][1:-1]
+    def __init__(self, attribute):
+        attribute = attribute[1:-1]
         self.nodes = ["0", "1"]
         self.edges = [["0", "1", attribute]]
 
 
 class LiteralAutomata(Automata):
-    def __init__(self, token):
-        attribute = token[1][1:-1]
+    def __init__(self, attribute):
+        attribute = attribute[1:-1]
         self.nodes = []
         self.edges = []
         for i in range(0, len(attribute)):
@@ -112,18 +138,14 @@ class LiteralAutomata(Automata):
 
 
 class CharacterClassAutomata(Automata):
-    def __init__(self, ast):
-        not_flag = False
-        if ast[0] == "NOT":
-            ast = ast[1]
-            not_flag = True
+    def __init__(self, ast, not_flag=False):
         charset = []
-        for token in ast[1]:
-            if token[0] == "CHARACTER":
-                attribute = token[1][1:-1]
+        for child in ast:
+            if child[0] == "CHARACTER":
+                attribute = child[1][1:-1]
                 charset = charset_union(charset, [attribute])
-            elif token[0] == "RANGE":
-                [lower_character, upper_character] = token[1]
+            elif child[0] == "RANGE":
+                [lower_character, upper_character] = child[1]
                 lower = ord(lower_character[1][1:-1])
                 upper = ord(upper_character[1][1:-1])
                 charset = charset_union(charset, charset_create(lower, upper))
@@ -131,8 +153,72 @@ class CharacterClassAutomata(Automata):
             charset = charset_complement(charset)
         automatas = []
         for char in charset:
-            token = ("CHARACTER", '"{0}"'.format(char))
-            automatas.append(CharacterAutomata(token))
+            automatas.append(CharacterAutomata('"{0}"'.format(char)))
         automata = Automata.union(automatas)
         self.nodes = automata.nodes
         self.edges = automata.edges
+
+
+class GroupAutomata(Automata):
+    def __init__(self, ast):
+        automata = Automata.parse(ast)
+        self.nodes = automata.nodes
+        self.edges = automata.edges
+
+
+class OptionalAutomata(Automata):
+    def __init__(self, automata):
+        self.nodes = []
+        self.edges = []
+        first = 0
+        last = 1 + len(automata.nodes)
+        i = 1
+        self.nodes.append(str(first))
+        for node in automata.nodes:
+            self.nodes.append(str(i + int(node)))
+        self.edges.append([str(first), str(i), ""])
+        for (origin, destiny, state) in automata.edges:
+            self.edges.append([str(i + int(origin)), str(i + int(destiny)), state])
+        i = i + len(automata.nodes)
+        self.edges.append([str(i - 1), str(last), ""])
+        self.edges.append([str(first), str(last), ""])
+        self.nodes.append(str(last))
+
+
+class PlusAutomata(Automata):
+    def __init__(self, automata):
+        self.nodes = []
+        self.edges = []
+        first = 0
+        last = 1 + len(automata.nodes)
+        i = 1
+        self.nodes.append(str(first))
+        for node in automata.nodes:
+            self.nodes.append(str(i + int(node)))
+        self.edges.append([str(first), str(i), ""])
+        for (origin, destiny, state) in automata.edges:
+            self.edges.append([str(i + int(origin)), str(i + int(destiny)), state])
+        i = i + len(automata.nodes)
+        self.edges.append([str(i - 1), str(last), ""])
+        self.edges.append([str(last - 1), str(first + 1), ""])
+        self.nodes.append(str(last))
+
+
+class StarAutomata(Automata):
+    def __init__(self, automata):
+        self.nodes = []
+        self.edges = []
+        first = 0
+        last = 1 + len(automata.nodes)
+        i = 1
+        self.nodes.append(str(first))
+        for node in automata.nodes:
+            self.nodes.append(str(i + int(node)))
+        self.edges.append([str(first), str(i), ""])
+        for (origin, destiny, state) in automata.edges:
+            self.edges.append([str(i + int(origin)), str(i + int(destiny)), state])
+        i = i + len(automata.nodes)
+        self.edges.append([str(i - 1), str(last), ""])
+        self.edges.append([str(first), str(last), ""])
+        self.edges.append([str(last - 1), str(first + 1), ""])
+        self.nodes.append(str(last))
