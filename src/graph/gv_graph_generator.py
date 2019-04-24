@@ -3,7 +3,9 @@ import platform
 
 
 class GVGraphGenerator:
-    def __init__(self, nodes=[], edges=[], graph_name="automata", path=os.getcwd()):
+    def __init__(
+        self, nodes=[], edges=[], graph_name="automata", path=os.getcwd(), size=20
+    ):
         self.graph_name = graph_name  # files name
         self.extension = ".gv"  # extension
         self.path = path  # path to save .gv and .png file
@@ -11,6 +13,7 @@ class GVGraphGenerator:
         # list within edges [[origin, destiny, symbol],[origin, destiny, symbol],...,n]
         self.edges = edges
         self.doc = ""  # contains the document
+        self.size = size
 
         # here we go
         self.BuildDocument()
@@ -66,7 +69,7 @@ class GVGraphGenerator:
         self.doc = self.doc + row
 
         # size , I'm noy sure size of what ? xd
-        row = '\n\tsize="20,20"'.format()
+        row = '\n\tsize="{0},{0}"'.format(self.size)
         self.doc = self.doc + row
 
         # call GenerateNodes
