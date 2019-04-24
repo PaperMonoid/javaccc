@@ -14,7 +14,9 @@ parser.add_argument("-i", "--input-file", type=str, help="an input csv file")
 
 parser.add_argument("-o", "--output-dir", type=str, help="an output directory")
 
-parser.add_argument("-s", "--size", type=int, default=20, help="image size")
+parser.add_argument(
+    "-s", "--size", type=int, default=10, help="image size (default 10)"
+)
 
 
 def save_automata(regex, name, output_dir, size):

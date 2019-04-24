@@ -1,12 +1,37 @@
 # JavaCCC
 A set of tools for Java Compiler Compiler™ (JavaCC™) made in python.
 
-# Getting started
-Create a new virtual environment and activate it. **This project REQUIRES python 3.**
-```shell
-# create virtual environment in the current directory
-virtualenv venv
+# Requitements
+These requirements are necessary for the project so please make sure to have them installed on your machine.
+* [Python 3](https://www.python.org/downloads/)
+* [Graphviz](http://www.graphviz.org/)
 
-# activate virtual environment
-source ./env/bin/activate
+# Getting started
+Run `python src -h` to get help.
 ```
+$ python src -h
+usage: src [-h] [-i INPUT_FILE] [-o OUTPUT_DIR] [-s SIZE]
+
+A set of tools for Java Compiler Compiler™ (JavaCC™) made in python.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT_FILE, --input-file INPUT_FILE
+                        an input csv file
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
+                        an output directory
+  -s SIZE, --size SIZE  image size (default 10)
+```
+
+This project requires a CSV file with the name of the token as the first field and the regular expression as the second field. This CSV file can easily be generated in excel or google sheets, just like this:
+
+![sample-file](imgs/sample-file.jpg)
+![sample-file](imgs/sample-save.jpg)
+
+After this you can use the command `python src -i INPUT_FILE -o OUTPUT_DIRECTORY`:
+```shell
+# run command
+python src -i Words.csv -o output
+```
+
+The images should be generated in the `output` directory.
