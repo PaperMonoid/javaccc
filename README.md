@@ -1,7 +1,9 @@
 # JavaCCC
 A set of tools for Java Compiler Compiler™ (JavaCC™) made in python.
 
-# Requitements
+![sample](imgs/sample.jpg)
+
+# Requirements
 These requirements are necessary for the project so please make sure to have them installed on your machine.
 * [Python 3](https://www.python.org/downloads/)
 * [Graphviz](http://www.graphviz.org/)
