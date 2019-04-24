@@ -63,21 +63,9 @@ class Optimizer:
             self.put_state(tn)
             origin = self.get_state_index(t)
             destiny = self.get_state_index(tn)
-            origin = self.remap(origin)
-            destiny = self.remap(destiny)
             self.edges.append([origin, destiny, state])
             if search < 0:
                 self.expand(tn)
-
-    def remap(self, state):
-        if state == 4:
-            return 2
-        elif state == 3:
-            return 4
-        elif state == 2:
-            return 3
-        else:
-            return state
 
     def optimize(self):
         t0 = self.e([self.automata.nodes[0]])

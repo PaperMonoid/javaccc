@@ -4,9 +4,12 @@ from regex.generator import generate
 from regex.optimizer import optimize
 
 
-def Regex(regex):
+def Regex(regex, optimize_flag=False):
     ast = parse(tokens(regex))
     if len(ast) == 0:
         raise ValueError("Nothing to parse")
     automata = generate(ast)
-    return optimize(automata)
+    if optimize_flag:
+        return optimize(automata)
+    else:
+        return automata
