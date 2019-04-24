@@ -72,6 +72,11 @@ class Automata:
                 automata = automata.concatenate(CharacterClassAutomata(child[1]))
             elif child[0] == "GROUP":
                 automata = automata.concatenate(GroupAutomata(child[1]))
+            elif child[0] == "OR":
+                subautomatas = []
+                for grandchild in child[1]:
+                    subautomatas.append(Automata.parse([grandchild]))
+                automata = automata.concatenate(Automata.union(subautomatas))
             elif child[0] == "OPTIONAL":
                 child = child[1]
                 if child[0] == "GROUP":
