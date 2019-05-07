@@ -1,0 +1,9 @@
+s_while,<t_while> s_condicion() (s_bloque() | nada()),
+s_condicion,t_lparen s_bool t_rparen,
+comando,(condicional() | iterativo() | atribuicao())*,
+rango,t_letra t_guion t_letra,A-z
+,,"{“rango”: { “inicio”: “A”, “termina”: “Z” }}"
+opcional,s_exp t_parentesis,“OK” ?
+,,{ “opcional”: “OK” }
+opart,t_numero t_opart t_numero,1 + 1
+,,"{ “op”: “+”, operandos: [“1”, “1”] }"
