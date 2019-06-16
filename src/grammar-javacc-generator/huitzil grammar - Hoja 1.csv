@@ -1,0 +1,44 @@
+g_program,(g_strict())? (g_import())? g_body()
+g_body,(g_instruction() | g_method()) g_more_body()
+g_more_body,(g_body())?
+g_instruction,(g_declaration() | g_declaration_strict() | g_conditional() | g_while() | g_for() | g_try_catch() | g_output() | g_switch() ) g_more_instructions()
+g_more_instructions,(g_instruction())?
+g_declaration,(<t_var> g_declaration_strict()) | ( <t_var_name> <t_assignment> (g_declaration_single() | g_declation_complete()))
+g_declaration_single,(g_value() | <t_null>) g_more_vars()
+g_declaration_complete,<t_data_type> <t_parenthesis_group_open> (g_value() | <t_null>) <t_parenthesis_group_close>
+g_declaration_strict,<t_var_name> <t_assignment> <t_data_type> <t_parenthesis_group_open> g_value() <t_parenthesis_group_close>
+g_value,g_text_value() | g_number_value() | <t_var_name> | <t_bool>
+g_text_value,<t_string_value> | <t_char_value> | g_input()
+g_number_value,<t_int_value> | <t_float_value> | <t_complex_value> | <t_snot_value>
+g_more_vars,(<t_comma> <t_var_name> <t_assignment> (g_declaration_single() | g_declation_complete()))?
+g_import,<t_import> <t_string_value> g_more_imports()
+g_more_imports,(<t_comma> <t_string_value>)?
+g_strict,<t_strict>
+g_conditional,<t_conditional> <t_parenthesis_group_open> g_condition() <t_parenthesis_group_close> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close> (g_elif())? (g_else())? (g_finally())?
+g_condition,g_logic_expression() | <t_bool> | g_comparison()
+g_comparison,g_value() <t_comparison_operator> g_value()
+g_logic_expression,<t_parenthesis_group_open> g_comparison() <t_parenthesis_group_close> <t_logic_operator> <t_parenthesis_group_open> g_comparison() <t_parenthesis_group_close> g_more_logic_expressions()
+g_more_logic_expressions,(g_logic_expression())?
+g_else,<t_else> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close>
+g_elif,<t_elif> <t_parenthesis_group_open> g_condition() <t_parenthesis_group_close> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close> g_more_elifs()
+g_more_elifs,(g_elif())?
+g_while,<t_while> <t_parenthesis_group_open> g_condition() <t_parenthesis_group_close> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close> (g_finally())?
+g_for,<t_for> <t_parenthesis_group_open> g_range() <t_parenthesis_group_close> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close>
+g_range,<t_var_name> <t_membership_operator> <t_range> <t_parenthesis_group_open> g_number_value() <t_comma> g_number_value() <t_parenthesis_group_close>
+g_try,<t_try> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close> g_catch() (g_finally())?
+g_catch,<t_catch> <t_parenthesis_group_open> g_exception() <t_parenthesis_group_close> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close> g_more_catchs()
+g_more_catchs,(g_catch())?
+g_finally,<t_finally> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close>
+g_not_yet,<t_not_yet>
+g_do_while,<t_do> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close> <t_while> <t_parenthesis_group_open> g_condition() <t_parenthesis_group_close>
+g_input,<t_input> <t_parenthesis_group_open> g_text_value() <t_parenthesis_group_close>
+g_output,<t_output> <t_parenthesis_group_open> g_text_value() <t_parenthesis_group_close>
+g_switch,<t_switch> <t_parenthesis_group_open> <t_var_name> <t_parenthesis_group_close> <t_parenthesis_group_open> g_case() g_default() <t_parenthesis_group_close>
+g_case,t_case <t_parenthesis_group_open> (g_condition() | g_value()) <t_parenthesis_group_close> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close> g_more_cases()
+g_more_cases,(g_case())?
+d_default,<t_default> <t_parenthesis_group_open> g_instruction() <t_parenthesis_group_close>
+g_method,<t_method> <t_parenthesis_group_open> g_parameter() <t_parenthesis_group_close> <t_parenthesis_group_open> g_instruction() g_return() <t_parenthesis_group_close> g_more_methods()
+g_parameter,<t_var_name> (<t_assignment> g_value())? g_more_parameters()
+g_more_parameters,(<t_comma> g_parameter())?
+g_more_methods,(g_method())?
+g_return,<t_return> g_value()

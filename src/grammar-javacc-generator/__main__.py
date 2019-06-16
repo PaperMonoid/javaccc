@@ -1,6 +1,6 @@
 import csv
 
-input_file = "example.csv"
+input_file = "huitzil grammar - Hoja 1.csv"
 
 with open(input_file) as csv_file:
     reader = csv.reader(csv_file, delimiter=",")
